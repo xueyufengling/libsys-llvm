@@ -20,7 +20,7 @@ enum init_as_state : int
 /**
  * @brief 初始化汇编器、反汇编器
  */
-extern init_as_state init_as(llvm_target target = sys::llvm::native_llvm_target);
+extern init_as_state init_as(llvm_target target = sys::llvm::host_llvm_target);
 }
 }
 

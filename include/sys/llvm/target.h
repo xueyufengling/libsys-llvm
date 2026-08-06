@@ -33,7 +33,7 @@ __enum_def__(0, llvm_target, , __llvm_all_support_target_list__())
 
 #define __llvm_target_enum__(target) (::sys::llvm::llvm_target::__enum_def_elem__(llvm_target, target))
 
-extern const llvm_target native_llvm_target;
+extern const llvm_target host_llvm_target;
 
 /**
  * @brief 必须CMake编译才有的宏定义，判断当前安装的LLVM build是否编译打包了指定架构的库函数
