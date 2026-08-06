@@ -21,7 +21,7 @@ set(PROJECT_SOURCE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
 file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp")
 
-add_compile_options(-g -O0 -ftime-report -ftime-report-details)
+add_compile_options(-g -Og -ftime-report -ftime-report-details)
 
 # Build as static library
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
@@ -42,25 +42,12 @@ set(LLVM_ENABLED_TARGETS_LIST X86)
 # Generate inc files
 include("./cmake/code_gen.cmake")
 
-# Link LLVM and its dependency
-# Assembler and Disassembler
-set(LLVM_LINK_COMPONENTS support target)
+llvm_map_components_to_libnames(LLVM_LINK_TARGETS ${LLVM_ENABLED_TARGETS_LIST})
 
-llvm_map_components_to_libnames(llvm_libs ${LLVM_LINK_COMPONENTS} ${LLVM_ENABLED_TARGETS_LIST})
-
-target_link_libraries(${PROJECT_NAME} ${llvm_libs} "${arch_LIBRARIES}")
+# ${LLVM_LINK_TARGETS} will be automatically‌ passed to downstream projects
+target_link_libraries(${PROJECT_NAME} "${arch_LIBRARIES}")
 
 # Install
- 
-set(PROJECT_INSTALL_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
-set(PROJECT_INSTALL_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/lib")
 set(PROJECT_INSTALL_LIBRARIES ${PROJECT_NAME})
-
-install(TARGETS ${PROJECT_NAME} DESTINATION "lib")
-install(DIRECTORY "${PROJECT_SOURCE_INCLUDE_DIRS}/" DESTINATION "include")
-message(STATUS "set copy path from \"${PROJECT_SOURCE_INCLUDE_DIRS}\" to \"${PROJECT_INSTALL_INCLUDE_DIRS}\"")
-
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake.in" "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake" @ONLY)
-message(STATUS "generated ${PROJECT_NAME}Config.cmake in: \"${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake\"")
-
-message(STATUS "configure complete, run cmake --build . --target install to copy include directory")
+set(PROJECT_EXTLINK_LIBRARIES ${LLVM_LINK_TARGETS} "${arch_LIBRARIES}")
+include("./cmake/install.cmake")

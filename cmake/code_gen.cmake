@@ -39,10 +39,10 @@ endforeach()
 file(APPEND ${TARGET_LIST_HEADER_FILE}
 	"\n#endif// _SYS_LLVM_TARGETLIST\n"
 )
-message(STATUS "Generated ${CMAKE_CURRENT_SOURCE_DIR}/include/sys/llvm/target_list.h")
+message(STATUS "generated ${CMAKE_CURRENT_SOURCE_DIR}/include/sys/llvm/target_list.h")
 
 set(TARGET_DISPATCH_ALL_INC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/target_func/incl/defs/def_llvm_target_func_dispatch_all.cpp.inc")
-# Generated dispatch function defs
+# generated dispatch function defs
 file(WRITE ${TARGET_DISPATCH_ALL_INC_FILE} "")
 foreach(target ${LLVM_ALL_SUPPORT_TARGETS})
 	file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/src/target_func/incl/defs/def_llvm_target_func_${target}.cpp.inc"
@@ -56,5 +56,5 @@ foreach(target ${LLVM_ALL_SUPPORT_TARGETS})
 	file(APPEND ${TARGET_DISPATCH_ALL_INC_FILE}
 		"#include \"def_llvm_target_func_${target}.cpp.inc\"\n"
 	)
-	message(STATUS "Generated dispatch function def for target ${target}")
+	message(STATUS "generated dispatch function def for target ${target}")
 endforeach()
