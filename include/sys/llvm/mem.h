@@ -5,6 +5,8 @@
 
 #include <arch/c_array.h>
 
+#include <llvm/ADT/SmallString.h>
+
 namespace llvm
 {
 class MemoryBuffer;
@@ -15,6 +17,10 @@ namespace sys
 {
 namespace llvm
 {
+constexpr size_t default_stack_buffer_size = 4096;
+
+typedef ::llvm::SmallString<default_stack_buffer_size> stack_buffer;
+
 extern std::unique_ptr<::llvm::MemoryBuffer> as_membuffer(const void* buf, size_t len, const char* name = "");
 
 /**

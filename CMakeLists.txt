@@ -13,8 +13,6 @@ find_package(LLVM REQUIRED)
 find_package(ppmp REQUIRED)
 find_package(arch REQUIRED)
 
-include("./cmake/code_gen.cmake")
-
 # link_directories() must be called before target is created.
 link_directories("${arch_LIBRARY_DIRS}")
 
@@ -35,16 +33,20 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${arch_INCLUDE_DIRS}")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${LLVM_DEFINITIONS})
 
-# Set LLVM backend arch
-# DO NOTE that not all backends are provided in msys2 package
-# Backend arch name is case sensitive
-set(LLVM_BACKENDS_ARCH X86)
+# Set LLVM enabled target arch
+# DO NOTE that not all targets are provided in msys2 package
+# Target arch name is case sensitive
+# Backend target should be involved in ${LLVM_TARGETS_TO_BUILD}
+set(LLVM_ENABLED_TARGETS_LIST X86)
+
+# Generate inc files
+include("./cmake/code_gen.cmake")
 
 # Link LLVM and its dependency
 # Assembler and Disassembler
 set(LLVM_LINK_COMPONENTS support target)
 
-llvm_map_components_to_libnames(llvm_libs ${LLVM_LINK_COMPONENTS} ${LLVM_BACKENDS_ARCH})
+llvm_map_components_to_libnames(llvm_libs ${LLVM_LINK_COMPONENTS} ${LLVM_ENABLED_TARGETS_LIST})
 
 target_link_libraries(${PROJECT_NAME} ${llvm_libs} "${arch_LIBRARIES}")
 

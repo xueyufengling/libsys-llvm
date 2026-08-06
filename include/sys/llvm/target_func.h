@@ -62,9 +62,9 @@ namespace llvm
 #define __llvm_target_func_info_args_name_list__(info)\
 	__declaration_name_list__(__decl_llvm_target_func_decl_name_list_expand_id__(), __llvm_target_func_info_args_list__(info))
 
-#define __llvm_disassembler_support_target_list__() __llvm_support_target_list_rm__(NVPTX, SPIRV)
+#define __llvm_disassembler_support_target_list__() __llvm_all_support_target_list_rm__(NVPTX, SPIRV)
 
-#define __llvm_asm_parser_support_target_list__() __llvm_support_target_list_rm__(NVPTX, SPIRV, XCore)
+#define __llvm_asm_parser_support_target_list__() __llvm_all_support_target_list_rm__(NVPTX, SPIRV, XCore)
 
 /**
  * @brief LLVM封装函数的执行结果
@@ -80,14 +80,18 @@ enum llvm_fcall_state
 /**
  * LLVM带架构名的函数的信息函数。
  * 其中NVPTX、SPIRV在设计上就未提供AsmParser汇编、Disassembler反汇编组件，XCore未提供AsmParser汇编组件。
- * src中编译单个函数的速度极其缓慢，占用内存达到惊人的16GB，且预处理耗时41.87s。因此不得已拆开#include __pp_for_each__()形式的循环展开头文件，手写每个函数且单独占一个源文件。
+ * src中编译单个函数的速度非常慢，且内存占用大。编译时间、内存占用均大致与 启用架构数×包装函数数量 成正比。其中启用架构数为
+ * #define __llvm_enable_target_<arch>__() 1
+ * 宏定义的数目（位于sys/llvm/target_list.h）
+ * 包装函数数量是__llvm_target_func_info_list__()定义的列表元素个数
+ * 若 启用架构数*包装函数数量 过大，超出了机器的内存，则必须拆开#include __pp_for_each__()形式的循环展开头文件，手写每个函数且单独占一个源文件。
  */
 #define __llvm_target_func_info_list__()\
-	__llvm_target_func_info__(void, LLVMInitialize, TargetInfo, initialize_target_info, __llvm_support_target_list__()),\
-	__llvm_target_func_info__(void, LLVMInitialize, Target, initialize_target, __llvm_support_target_list__()),\
-	__llvm_target_func_info__(void, LLVMInitialize, TargetMC, initialize_target_mc, __llvm_support_target_list__()),\
+	__llvm_target_func_info__(void, LLVMInitialize, TargetInfo, initialize_target_info, __llvm_all_support_target_list__()),\
+	__llvm_target_func_info__(void, LLVMInitialize, Target, initialize_target, __llvm_all_support_target_list__()),\
+	__llvm_target_func_info__(void, LLVMInitialize, TargetMC, initialize_target_mc, __llvm_all_support_target_list__()),\
 	__llvm_target_func_info__(void, LLVMInitialize, Disassembler, initialize_disassembler, __llvm_disassembler_support_target_list__()),\
-	__llvm_target_func_info__(void, LLVMInitialize, AsmPrinter, initialize_asm_printer, __llvm_support_target_list__()),\
+	__llvm_target_func_info__(void, LLVMInitialize, AsmPrinter, initialize_asm_printer, __llvm_all_support_target_list__()),\
 	__llvm_target_func_info__(void, LLVMInitialize, AsmParser, initialize_asm_parser, __llvm_asm_parser_support_target_list__())
 
 /**
