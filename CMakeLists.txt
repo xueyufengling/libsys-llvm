@@ -5,11 +5,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(sys-llvm)
 
+set(PROJECT_PACKAGE_NAME sys_llvm)
+
 # Set zlib find path. zlib doesn't have Config.cmake so find_package() cannot find it.
 set(CMAKE_PREFIX_PATH "C:/msys64/ucrt64")
 find_package(LLVM REQUIRED)
 find_package(ppmp REQUIRED)
 find_package(arch REQUIRED)
+
+include("./cmake/code_gen.cmake")
 
 # link_directories() must be called before target is created.
 link_directories("${arch_LIBRARY_DIRS}")
@@ -23,13 +27,6 @@ add_compile_options(-g -O0 -ftime-report -ftime-report-details)
 
 # Build as static library
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
-
-# LLVM build arch detect
-# find existed target and define macro
-foreach(target ${LLVM_TARGETS_TO_BUILD})
-	message(STATUS "find build target: ${target}")
-	target_compile_definitions(${PROJECT_NAME} PUBLIC "__llvm_build_target_${target}__")
-endforeach()
 
 target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_SOURCE_INCLUDE_DIRS}")
 target_include_directories(${PROJECT_NAME} PUBLIC "${SOURCE_DIR}")
