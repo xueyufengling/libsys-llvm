@@ -39,15 +39,35 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${LLVM_DEFINITIONS})
 # Backend target should be involved in ${LLVM_TARGETS_TO_BUILD}
 set(LLVM_ENABLED_TARGETS_LIST X86)
 
+set(LLVM_EXT_COMPONENTS_LIST Object)
+
 # Generate inc files
 include("./cmake/code_gen.cmake")
 
-llvm_map_components_to_libnames(LLVM_LINK_TARGETS ${LLVM_ENABLED_TARGETS_LIST})
+llvm_map_components_to_libnames(LLVM_FULL_LINK_LIBRARIES ${LLVM_EXT_COMPONENTS_LIST} ${LLVM_ENABLED_TARGETS_LIST})
+set(LLVM_LINK_LIBRARIES)
 
-# ${LLVM_LINK_TARGETS} will be automatically‌ passed to downstream projects
-target_link_libraries(${PROJECT_NAME} "${arch_LIBRARIES}")
+# Remove components related to IR
+set(LLVM_DISABLE_COMPONENTS_LIST CodeGen)
+
+# Components to be removed in supermassive arch module
+foreach(lib ${LLVM_FULL_LINK_LIBRARIES})
+	set(keep TRUE)
+	foreach(disable ${LLVM_DISABLE_COMPONENTS_LIST})
+		if(lib MATCHES ${disable})
+			set(keep FALSE)
+			break()
+		endif()
+	endforeach()
+	if(keep)
+		list(APPEND LLVM_LINK_LIBRARIES ${lib})
+	endif()
+endforeach()
+
+# ${LLVM_LINK_LIBRARIES} will be automatically‌ passed to downstream projects
+set(PROJECT_EXTLINK_LIBRARIES ${LLVM_LINK_LIBRARIES} "${arch_LIBRARIES}")
+target_link_libraries(${PROJECT_NAME} ${PROJECT_EXTLINK_LIBRARIES})
 
 # Install
 set(PROJECT_INSTALL_LIBRARIES ${PROJECT_NAME})
-set(PROJECT_EXTLINK_LIBRARIES ${LLVM_LINK_TARGETS} "${arch_LIBRARIES}")
 include("./cmake/install.cmake")

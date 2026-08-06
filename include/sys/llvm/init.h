@@ -1,26 +1,26 @@
 #ifndef _SYS_LLVM_INIT
 #define _SYS_LLVM_INIT
 
+#include <arch/bit_flag.h>
+
 #include "target.h"
 
 namespace sys
 {
 namespace llvm
 {
-/**
- * @brief 基本的初始化，必须调用
- */
-extern bool init_target(llvm_target target = sys::llvm::native_llvm_target);
+enum init_as_state : int
+{
+	init_as_state_all_success = 0,
+	init_as_state_target_failed = arch::bit_flag<int>(0),
+	init_as_state_asm_failed = arch::bit_flag<int>(1),
+	init_as_state_disasm_failed = arch::bit_flag<int>(2)
+};
 
 /**
- * @brief 初始化汇编器
+ * @brief 初始化汇编器、反汇编器
  */
-extern bool init_asm(llvm_target target = sys::llvm::native_llvm_target);
-
-/**
- * @brief 初始化反汇编器
- */
-extern bool init_disasm(llvm_target target = sys::llvm::native_llvm_target);
+extern init_as_state init_as(llvm_target target = sys::llvm::native_llvm_target);
 }
 }
 

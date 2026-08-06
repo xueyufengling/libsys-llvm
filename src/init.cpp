@@ -4,24 +4,15 @@
 
 using namespace sys::llvm;
 
-bool sys::llvm::init_target(llvm_target target)
+init_as_state sys::llvm::init_as(llvm_target target)
 {
-	bool ret = true;
-	ret &= !initialize_target_info(target);
-	ret &= !initialize_target(target);
-	ret &= !initialize_target_mc(target);
-	return ret;
-}
-
-bool sys::llvm::init_asm(llvm_target target)
-{
-	return !initialize_asm_parser(target);
-}
-
-bool sys::llvm::init_disasm(llvm_target target)
-{
-	bool ret = true;
-	ret &= !initialize_disassembler(target);
-	ret &= !initialize_asm_printer(target);
-	return ret;
+	int ret = init_as_state::init_as_state_all_success;
+	// 不需要短路运算
+	if(!initialize_target_info(target) | !initialize_target_mc(target))
+		ret |= init_as_state::init_as_state_target_failed;
+	if(!initialize_asm_parser(target))
+		ret |= init_as_state::init_as_state_asm_failed;
+	if(!initialize_disassembler(target))
+		ret |= init_as_state::init_as_state_disasm_failed;
+	return (init_as_state)ret;
 }

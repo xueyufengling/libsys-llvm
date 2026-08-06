@@ -88,10 +88,8 @@ enum llvm_fcall_state
  */
 #define __llvm_target_func_info_list__()\
 	__llvm_target_func_info__(void, LLVMInitialize, TargetInfo, initialize_target_info, __llvm_all_support_target_list__()),\
-	__llvm_target_func_info__(void, LLVMInitialize, Target, initialize_target, __llvm_all_support_target_list__()),\
 	__llvm_target_func_info__(void, LLVMInitialize, TargetMC, initialize_target_mc, __llvm_all_support_target_list__()),\
 	__llvm_target_func_info__(void, LLVMInitialize, Disassembler, initialize_disassembler, __llvm_disassembler_support_target_list__()),\
-	__llvm_target_func_info__(void, LLVMInitialize, AsmPrinter, initialize_asm_printer, __llvm_all_support_target_list__()),\
 	__llvm_target_func_info__(void, LLVMInitialize, AsmParser, initialize_asm_parser, __llvm_asm_parser_support_target_list__())
 
 /**
